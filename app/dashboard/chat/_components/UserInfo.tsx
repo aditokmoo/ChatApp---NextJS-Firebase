@@ -14,16 +14,16 @@ interface PropTypes {
 
 export default function UserInfo({ data }: PropTypes) {
     return (
-        <div className="bg-light-dark p-6 flex justify-between gap-6 rounded-xl hover:opacity-80 cursor-pointer">
-            <div className="bg-primary flex justify-center items-center p-6 rounded-full w-18">
+        <div className="bg-light-dark p-4 flex justify-between gap-6 rounded-xl hover:opacity-80 cursor-pointer">
+            <div className="bg-gray-800 flex justify-center items-center p-6 rounded-full w-18 h-16">
                 <FaUser className='text-white text-xl' />
             </div>
-            <div className="flex flex-col gap-4 text-white w-full">
+            <div className="flex flex-col gap-2 text-white w-full">
                 <div className="flex justify-between">
                     <h4>{data.name}</h4>
-                    <span>{data.lastMessageTime}</span>
+                    <span className='text-xs text-gray-600'>{data.lastMessageTime}</span>
                 </div>
-                <p>{data.message}</p>
+                <p className='text-sm text-gray-500'>{data.message}</p>
             </div>
         </div>
     )

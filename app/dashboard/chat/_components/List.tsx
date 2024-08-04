@@ -8,28 +8,28 @@ const userData = [
         id: 1,
         avatar: <FaUser />,
         name: 'John Doe',
-        message: 'Lorem ipsum dolor sit amet',
+        message: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia.",
         lastMessageTime: '19:48'
     },
     {
         id: 2,
         avatar: <FaUser />,
         name: 'John Doe',
-        message: 'Lorem ipsum dolor sit amet',
+        message: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia.",
         lastMessageTime: '19:48'
     },
     {
         id: 3,
         avatar: <FaUser />,
         name: 'John Doe',
-        message: 'Lorem ipsum dolor sit amet',
+        message: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia.",
         lastMessageTime: '19:48'
     },
     {
         id: 4,
         avatar: <FaUser />,
         name: 'John Doe',
-        message: 'Lorem ipsum dolor sit amet',
+        message: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia.",
         lastMessageTime: '19:48'
     }
 ]
