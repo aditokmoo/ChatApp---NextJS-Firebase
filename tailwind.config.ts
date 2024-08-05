@@ -18,6 +18,7 @@ const config: Config = {
         'light-primary': '#8c3c56',
         'light-dark': '#2e3042',
         dark: '#2F3245',
+        green: '#21c246',
         'rgba-dark': 'rgba(46, 50, 69, 0.3)'
       }
     },

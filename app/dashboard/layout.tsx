@@ -5,7 +5,7 @@ export default function DashboardLayout({ children }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <main className='p-4 h-full flex justify-between'>
+        <main className='h-full flex justify-between'>
             <Sidebar />
             {children}
         </main>

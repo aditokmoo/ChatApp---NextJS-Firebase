@@ -9,7 +9,7 @@ export default function SidebarLinks() {
     const pathname = usePathname();
     console.log(pathname)
     return (
-        <ul className="flex flex-col gap-4 text-2xl">
+        <ul className="flex flex-col gap-4 text-xl">
             <Link href='/dashboard' className={`p-5 hover:bg-rgba-dark transition-all duration-300 rounded-xl ${pathname === '/dashboard' && 'bg-primary'}`}><AiFillHome /></Link>
             <Link href='/dashboard/chat' className={`p-5 hover:bg-rgba-dark transition-all duration-300 rounded-xl ${pathname === '/dashboard/chat' && 'bg-primary'}`}><TbMessageCircle2Filled /></Link>
             <Link href='/dashboard/settings' className={`p-5 hover:bg-rgba-dark transition-all duration-300 rounded-xl ${pathname === '/dashboard/settings' && 'bg-primary'}`}><MdSettings /></Link>
