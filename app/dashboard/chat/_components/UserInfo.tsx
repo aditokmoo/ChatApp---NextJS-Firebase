@@ -25,7 +25,7 @@ export default function UserInfo({ data }: PropTypes) {
                 {data.status ? (
                     <div className='absolute top-1 right-1 rounded-full w-3 h-3 bg-green'></div>
                 ):(
-                    <p className='absolute bottom-0 text-[9px] text-gray-400 rounded-full bg-[#9fc4bc] text-[#000] font-bold px-2'>{data.lastActive}</p>
+                    <p className='absolute bottom-0 py-[2px] text-[9px] text-gray-400 rounded-full bg-[#dff7eb] text-[#000] font-bold px-2'>{data.lastActive}</p>
                 )}
             </div>
             <div className="flex flex-col gap-2 text-white w-full">
