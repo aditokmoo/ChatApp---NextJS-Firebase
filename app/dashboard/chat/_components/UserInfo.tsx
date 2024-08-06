@@ -33,7 +33,7 @@ export default function UserInfo({ data }: PropTypes) {
                     <h4 className={data.notification ? 'font-bold' : 'font-medium'}>{data.name}</h4>
                     <span className='text-xs text-gray-600'>{data.lastMessageTime}</span>
                 </div>
-                <p className={`text-sm text-gray-500 w-72 ${data.notification ? 'font-medium text-gray-300': 'font-regular'}`}>{data.message}</p>
+                <p className={`text-sm text-gray-500 w-72 ${data.notification ? 'font-medium text-white': 'font-regular'}`}>{data.message}</p>
             </div>
         </div>
     )
