@@ -3,13 +3,6 @@ import { storage } from "./firebase";
 import { v4 as uuidv4 } from 'uuid';
 
 const upload = async (file: File[], setProgress: (progress: number) => void) => {
-    const date = new Date();
-    console.log(file)
-    console.log(file[0])
-
-    console.log(uuidv4())
-    console.log(uuidv4)
-
     return new Promise((resolve, reject) => {
         const storageRef = ref(storage, `images/${uuidv4()}-${file[0].name}`);
 
