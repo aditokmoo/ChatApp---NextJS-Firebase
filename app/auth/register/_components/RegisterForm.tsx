@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import noImageUser from '@/assets/no-image-user-avatar.png'
 import Image from 'next/image';
 import { useState } from 'react';
+import ProgressBar from '@/components/ProgressBar';
 
 interface AvatarState {
     file: File | null;
@@ -15,8 +16,8 @@ export default function RegisterForm() {
         file: null,
         imageUrl: ''
     });
-    const { register, handleSubmit, formState: { errors }, reset } = useForm();
-    const { createAccount } = useAuth();
+    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { createAccount, progress, isLoading } = useAuth();
 
     console.log(errors)
 
@@ -33,8 +34,8 @@ export default function RegisterForm() {
     return (
         <form className="flex flex-col gap-4" onSubmit={handleSubmit((data) => {
             createAccount(data as any)
-            reset();
         })}>
+            <ProgressBar progress={progress} />
             <label htmlFor="avatar">
                 <Image src={avatar.imageUrl ? avatar.imageUrl : noImageUser} alt="user" width={70} height={70} className='rounded-full mx-auto hover:opacity-80 cursor-pointer' />
                 <input type="file" id="avatar" className='hidden'
@@ -44,7 +45,7 @@ export default function RegisterForm() {
             <input {...register('username', { required: 'Username is required' })} type="text" placeholder="Username..." id="username" name="username" className="p-4 text-sm bg-dark rounded-sm" />
             <input {...register('email', { required: 'Email is required' })} type="text" placeholder="Email..." id="email" name="email" className="p-4 text-sm bg-dark rounded-sm" />
             <input {...register('password', { required: 'Password is required' })} type="password" placeholder="Password..." id="password" name="password" className="p-4 text-sm bg-dark rounded-sm" />
-            <button className="bg-primary p-2 rounded-sm font-semibold text-white">Create account</button>
+            <button className={`p-4 rounded-md font-semibold text-sm ${isLoading ? 'bg-dark opacity-70 text-black' : 'bg-primary text-white'}`} disabled={isLoading}>Create account</button>
         </form>
     )
 }
