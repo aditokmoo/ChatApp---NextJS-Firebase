@@ -1,7 +1,7 @@
 'use client'
 import { auth, db } from "@/lib/firebase";
 import upload from "@/lib/upload";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,6 +12,11 @@ interface RegisterDataType {
     email: string,
     password: string,
     avatar: File[],
+}
+
+interface LoginDataType {
+    email: string,
+    password: string
 }
 
 export default function useAuth() {
@@ -45,7 +50,7 @@ export default function useAuth() {
             });
             
             toast.success('Account has been created!');
-            router.push('/dashboard');
+            router.push('/auth/login');
         } catch (error) {
             if (error instanceof Error && error.message === 'Firebase: Error (auth/email-already-in-use).') {
                 toast.error('Email already in use!');
@@ -57,5 +62,28 @@ export default function useAuth() {
         }
     }
 
-    return { createAccount, progress, isLoading };
+    const login = async (data: LoginDataType) => {
+        const { email, password } = data;
+
+        setIsLoading(false);
+
+        try {
+            const response = await signInWithEmailAndPassword(auth, email, password);
+
+            console.log(response)
+
+            toast.success('Successfully logged in!');
+            router.push('/dashboard')
+        } catch (error) {
+            if(error instanceof Error && error.message === 'Firebase: Error (auth/invalid-credential).') {
+                toast.error('Wrong credentials!')
+            } else {
+                toast.error(error instanceof Error && error.message);
+            }
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    return { createAccount, login, progress, isLoading };
 }
