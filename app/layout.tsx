@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import "./globals.css";
+import QueryProvider from "./_components/QueryProvider";
 
 const poppins = Poppins({ weight: '400', subsets: ["latin"] });
 
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
         <ToastContainer />
       </body>
     </html>

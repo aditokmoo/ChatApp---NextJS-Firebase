@@ -10,7 +10,7 @@ export default function Sidebar() {
                     <IoChatbubblesOutline className="text-[2.5rem]" />
                     <SidebarLinks />
                 </div>
-                <Link href='#' className="text-2xl"><FaCircleUser /></Link>
+                <Link href='/dashboard/profile' className="text-2xl"><FaCircleUser /></Link>
             </div>
         </nav>
     )

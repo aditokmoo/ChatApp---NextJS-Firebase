@@ -20,9 +20,9 @@ interface LoginDataType {
 }
 
 export default function useAuth() {
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [progress, setProgress] = useState(0);
-    const router = useRouter();
 
     const createAccount = async (data: RegisterDataType) => {
         const { username, email, password, avatar } = data;
@@ -36,7 +36,7 @@ export default function useAuth() {
                 setProgress(progress);
             });
 
-            
+
             await setDoc(doc(db, "users", response.user.uid), {
                 username,
                 email,
@@ -44,11 +44,11 @@ export default function useAuth() {
                 id: response.user.uid,
                 blocked: [],
             });
-            
+
             await setDoc(doc(db, "userChats", response.user.uid), {
                 chats: [],
             });
-            
+
             toast.success('Account has been created!');
             router.push('/auth/login');
         } catch (error) {
@@ -65,23 +65,23 @@ export default function useAuth() {
     const login = async (data: LoginDataType) => {
         const { email, password } = data;
 
-        setIsLoading(false);
+        setIsLoading(true);
 
         try {
             const response = await signInWithEmailAndPassword(auth, email, password);
+            console.log(response);
 
-            console.log(response)
-
+            // Show the success toast and navigate immediately
             toast.success('Successfully logged in!');
-            router.push('/dashboard')
+            router.push('/dashboard');
         } catch (error) {
-            if(error instanceof Error && error.message === 'Firebase: Error (auth/invalid-credential).') {
-                toast.error('Wrong credentials!')
+            if (error instanceof Error && error.message === 'Firebase: Error (auth/invalid-credential).') {
+                toast.error('Wrong credentials!');
             } else {
                 toast.error(error instanceof Error && error.message);
             }
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
