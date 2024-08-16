@@ -1,22 +1,32 @@
 'use client'
-import useCurrentUser from '@/hooks/useCurrentUser';
 import Sidebar from './_components/Sidebar';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useUserStore } from '@/zustand/userStore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function DashboardLayout({ children }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { data: user, isLoading } = useCurrentUser();
+    const { currentUser, isLoading, fetchUserInfo } = useUserStore();
     const router = useRouter();
 
     useEffect(() => {
-        if (!isLoading && !user) {
+        const unSub = onAuthStateChanged(auth, (user) => {
+            fetchUserInfo(user?.uid);
+        })
+
+        return () => unSub()
+    }, [fetchUserInfo])
+
+    useEffect(() => {
+        if (!isLoading && !currentUser) {
             router.push('/auth/login');
         }
-    }, [isLoading, user, router]);
-    
-    if (isLoading || (!isLoading && !user)) {
+    }, [isLoading, currentUser, router]);
+
+    if (isLoading || (!isLoading && !currentUser)) {
         return <h2>Loading...</h2>
     }
 
