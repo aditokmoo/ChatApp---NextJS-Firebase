@@ -42,6 +42,7 @@ export default function useAuth() {
                 email,
                 avatar: imgUrl,
                 id: response.user.uid,
+                friends: [],
                 blocked: [],
             });
 

@@ -21,7 +21,7 @@ export default function DashboardLayout({ children }: Readonly<{
     }, [fetchUserInfo])
 
     useEffect(() => {
-        if (!isLoading && !currentUser) {
+        if (!currentUser) {
             router.push('/auth/login');
         }
     }, [isLoading, currentUser, router]);
