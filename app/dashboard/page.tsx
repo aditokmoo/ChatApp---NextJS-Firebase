@@ -1,11 +1,11 @@
+import List from "./_components/List";
 import NewJoinDashboard from "./_components/NewJoinDashboard";
-import UserList from "./_components/UserList";
 
 export default function DashboardPage() {
     return (
         <main className="w-full flex">
             <NewJoinDashboard />
-            <UserList />
+            <List />
         </main>
     )
 }

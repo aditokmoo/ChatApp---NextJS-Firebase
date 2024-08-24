@@ -62,13 +62,13 @@ export async function fetchFriendRequests(currentUser) {
     if (!currentUser) return;
 
     try {
-        const userDoc = doc(db, "friendRequests", currentUser.id); // Reference to the document in the friendRequests collection
+        const userDoc = doc(db, "friendRequests", currentUser.id);
         const userSnapshot = await getDoc(userDoc);
 
         if (userSnapshot.exists()) {
-            return userSnapshot.data(); // This should include both sentRequests and receivedRequests
+            return userSnapshot.data();
         } else {
-            return { sentRequests: [], receivedRequests: [] }; // Return empty arrays if the document doesn't exist
+            return { sentRequests: [], receivedRequests: [] };
         }
     } catch (error) {
         console.error("Error fetching friend requests: ", error);
@@ -77,8 +77,6 @@ export async function fetchFriendRequests(currentUser) {
 }
 
 export async function sendFriendRequest(currentUser: any, user: any) {
-    console.log(currentUser)
-    console.log(user)
     const currentUserRef = doc(db, 'friendRequests', currentUser.id);
     const recipientUserRef = doc(db, 'friendRequests', user.id);
 
@@ -101,14 +99,33 @@ export async function sendFriendRequest(currentUser: any, user: any) {
             });
         }
 
+        // Fetch additional user data from users collection
+        const currentUserData = (await getDoc(doc(db, 'users', currentUser.id))).data();
+        const recipientUserData = (await getDoc(doc(db, 'users', user.id))).data();
+
+        // Create objects to store in sentRequests and receivedRequests
+        const currentUserRequestData = {
+            id: currentUser.id,
+            username: currentUserData?.username,
+            email: currentUserData?.email,
+            avatar: currentUserData?.avatar,
+        };
+
+        const recipientUserRequestData = {
+            id: user.id,
+            username: recipientUserData?.username,
+            email: recipientUserData?.email,
+            avatar: recipientUserData?.avatar,
+        };
+
         // Add to the current user's sent requests
         await updateDoc(currentUserRef, {
-            sentRequests: arrayUnion(user.id)
+            sentRequests: arrayUnion(recipientUserRequestData),
         });
 
         // Add to the recipient user's received requests
         await updateDoc(recipientUserRef, {
-            receivedRequests: arrayUnion(currentUser.id)
+            receivedRequests: arrayUnion(currentUserRequestData),
         });
 
         // Fetch and return the updated documents
@@ -117,11 +134,11 @@ export async function sendFriendRequest(currentUser: any, user: any) {
 
         return {
             sentRequests: updatedCurrentUserDoc.data()?.sentRequests || [],
-            receivedRequests: updatedCurrentUserDoc.data()?.receivedRequests || []
+            receivedRequests: updatedRecipientUserDoc.data()?.receivedRequests || [],
         };
     } catch (error) {
         console.error("Error sending friend request:", error);
-        throw error; // Optional: rethrow the error to be handled by the caller
+        throw error;
     }
 }
 
