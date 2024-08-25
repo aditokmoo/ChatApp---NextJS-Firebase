@@ -6,7 +6,7 @@ import { TbMessageDots } from "react-icons/tb";
 import { FaSearch } from 'react-icons/fa';
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { LiaUserCheckSolid } from "react-icons/lia";
-import { useSendFriendRequest, useStartChat } from '@/hooks/useUserActions';
+import { useCancelFriendRequest, useSendFriendRequest, useStartChat } from '@/hooks/useUserActions';
 import { MoonLoader } from 'react-spinners';
 
 export default function UserList() {
@@ -14,6 +14,7 @@ export default function UserList() {
     const { currentUser } = useUserStore();
     const { mutate: startChat, isPending: isLoadingChat } = useStartChat();
     const { mutate: sendFriendRequest, data: requests, isPending: isLoadingFriendRequest } = useSendFriendRequest(currentUser);
+    const { mutate: cancelFriendRequest, isPending: isLoadingCancelRequest } = useCancelFriendRequest(currentUser);
 
     if (isLoading || isLoadingChat) return <div>Loading...</div>
 
@@ -43,11 +44,11 @@ export default function UserList() {
                                     <TbMessageDots className='text-gray-400 text-xl cursor-pointer' onClick={() => startChat({ currentUser, user })} />
                                 </div>
                                 <div className="bg-[#15182e] hover:opacity-60 p-2 rounded-full">
-                                    {isLoadingFriendRequest ? (
+                                    {isLoadingFriendRequest || isLoadingCancelRequest ? (
                                         <MoonLoader />
                                     ) : (
                                         requests?.sentRequests.some(request => request.id === user.id) ? (
-                                            <LiaUserCheckSolid className='text-gray-400 text-xl cursor-pointer' />
+                                            <LiaUserCheckSolid className='text-gray-400 text-xl cursor-pointer' onClick={() => cancelFriendRequest({ currentUser, user })} />
                                         ) : (
                                             <AiOutlineUserAdd className='text-gray-400 text-xl cursor-pointer' onClick={() => sendFriendRequest({ currentUser, user })} />
                                         )

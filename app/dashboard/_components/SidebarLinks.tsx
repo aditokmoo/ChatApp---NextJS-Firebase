@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 
 export default function SidebarLinks() {
     const pathname = usePathname();
-    console.log(pathname)
     return (
         <ul className="flex flex-col gap-4 text-xl">
             <Link href='/dashboard' className={`p-5 hover:bg-rgba-dark transition-all duration-300 rounded-xl ${pathname === '/dashboard' && 'bg-primary'}`}><AiFillHome /></Link>

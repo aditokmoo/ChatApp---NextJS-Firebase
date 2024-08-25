@@ -1,7 +1,6 @@
 'use client'
 
 import Link from "next/link";
-import { FaCircleUser } from "react-icons/fa6";
 import SidebarLinks from "./SidebarLinks";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { useUserStore } from "@/zustand/userStore";
@@ -11,8 +10,6 @@ export default function Sidebar() {
     const { currentUser, isLoading } = useUserStore();
 
     if (isLoading) return <h2>Loading...</h2>
-
-    console.log(currentUser)
 
     return (
         <nav className="bg-[#0c0d14] shadow-2xl px-2 py-8 h-full">

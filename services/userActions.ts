@@ -147,16 +147,46 @@ export async function cancelFriendRequest(currentUser: any, user: any) {
     const recipientUserRef = doc(db, 'friendRequests', user?.id);
 
     try {
-        // Remove from the current user's sent requests
-        await updateDoc(currentUserRef, {
-            sentRequests: arrayRemove(user?.id)
-        });
+        // Fetch the current state of the documents
+        const currentUserDoc = await getDoc(currentUserRef);
+        const recipientUserDoc = await getDoc(recipientUserRef);
 
-        // Remove from the recipient user's received requests
-        await updateDoc(recipientUserRef, {
-            receivedRequests: arrayRemove(currentUser?.id)
-        });
+        const currentUserData = currentUserDoc.data();
+        const recipientUserData = recipientUserDoc.data();
+
+        // Find the request objects to remove
+        const sentRequestToRemove = currentUserData?.sentRequests?.find(
+            (req: any) => req.id === user.id
+        );
+
+        const receivedRequestToRemove = recipientUserData?.receivedRequests?.find(
+            (req: any) => req.id === currentUser.id
+        );
+
+        // Update the current user's sent requests by removing the recipient's request
+        if (sentRequestToRemove) {
+            await updateDoc(currentUserRef, {
+                sentRequests: arrayRemove(sentRequestToRemove),
+            });
+        }
+
+        // Update the recipient user's received requests by removing the current user's request
+        if (receivedRequestToRemove) {
+            await updateDoc(recipientUserRef, {
+                receivedRequests: arrayRemove(receivedRequestToRemove),
+            });
+        }
+
+        // Fetch and return the updated documents
+        const updatedCurrentUserDoc = await getDoc(currentUserRef);
+        const updatedRecipientUserDoc = await getDoc(recipientUserRef);
+
+        return {
+            sentRequests: updatedCurrentUserDoc.data()?.sentRequests || [],
+            receivedRequests: updatedRecipientUserDoc.data()?.receivedRequests || [],
+        };
     } catch (error) {
-        console.log("Error canceling friend request:", error);
+        console.error("Error canceling friend request:", error);
+        throw error;
     }
-};
+}

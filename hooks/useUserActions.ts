@@ -1,4 +1,4 @@
-import { fetchFriendRequests, sendFriendRequest, startChat } from "@/services/userActions";
+import { cancelFriendRequest, fetchFriendRequests, sendFriendRequest, startChat } from "@/services/userActions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
@@ -6,7 +6,7 @@ export function useSendFriendRequest(currentUser) {
     const queryClient = useQueryClient();
 
     const { data, isLoading } = useQuery({
-        queryKey: ['friendRequests'],
+        queryKey: ['friendRequests', currentUser.id],
         queryFn: () => fetchFriendRequests(currentUser),
         enabled: !!currentUser,
         staleTime: 1000 * 60 * 5,
@@ -29,8 +29,24 @@ export function useSendFriendRequest(currentUser) {
     return { mutate, isPending, data, isLoading };
 }
 
-export function useCancelFriendRequest(currentUser: any, user: any) {
+export function useCancelFriendRequest(currentUser) {
+    const queryClient = useQueryClient();
 
+    const { mutate, isPending } = useMutation({
+        mutationKey: ['cancelFriendRequest'],
+        mutationFn: ({ currentUser, user }) => cancelFriendRequest(currentUser, user),
+        onSuccess: (result) => {
+            console.log('Friend request has been canceled!', result)
+            // Invalidate the friendRequests query to refetch the data
+            queryClient.invalidateQueries(['friendRequests', currentUser?.id]);
+        },
+        onError: (error) => {
+            toast.error('Something went wrong!');
+            console.log(error)
+        }
+    });
+    
+    return { mutate, isPending }
 }
 
 export function useStartChat() {
