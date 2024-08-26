@@ -3,7 +3,7 @@ import useGetAllUsers from '@/hooks/useUser'
 import { useUserStore } from '@/zustand/userStore';
 import Image from 'next/image';
 import { TbMessageDots } from "react-icons/tb";
-import { FaSearch } from 'react-icons/fa';
+import { FaCheck, FaSearch, FaTimes } from 'react-icons/fa';
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { LiaUserCheckSolid } from "react-icons/lia";
 import { useCancelFriendRequest, useSendFriendRequest, useStartChat } from '@/hooks/useUserActions';
@@ -40,24 +40,38 @@ export default function UserList() {
                         </div>
                         {currentUser?.id !== user?.id && (
                             <div className="absolute right-4 top-7 flex items-center gap-2">
-                                <div className="bg-[#15182e] hover:opacity-60 p-2 rounded-full">
-                                    <TbMessageDots className='text-gray-400 text-xl cursor-pointer' onClick={() => startChat({ currentUser, user })} />
-                                </div>
-                                <div className="bg-[#15182e] hover:opacity-60 p-2 rounded-full">
-                                    {isLoadingFriendRequest || isLoadingCancelRequest ? (
-                                        <MoonLoader />
-                                    ) : (
-                                        requests?.sentRequests.some(request => request.id === user.id) ? (
-                                            <LiaUserCheckSolid className='text-gray-400 text-xl cursor-pointer' onClick={() => cancelFriendRequest({ currentUser, user })} />
-                                        ) : (
-                                            <AiOutlineUserAdd className='text-gray-400 text-xl cursor-pointer' onClick={() => sendFriendRequest({ currentUser, user })} />
-                                        )
-                                    )}
-                                </div>
+                                {requests?.receivedRequests.some(request => request.id === user.id) ? (
+                                    <div className="flex items-center gap-3 justify-end w-full">
+                                        <div className="p-2 bg-green rounded-md cursor-pointer hover:opacity-70">
+                                            <FaCheck className='shadow-xl' />
+                                        </div>
+                                        <div className="p-2 bg-[#15182e] rounded-md cursor-pointer hover:opacity-70">
+                                            <FaTimes />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="bg-[#15182e] hover:opacity-60 p-2 rounded-full">
+                                            <TbMessageDots className='text-gray-400 text-xl cursor-pointer' onClick={() => startChat({ currentUser, user })} />
+                                        </div>
+                                        <div className="bg-[#15182e] hover:opacity-60 p-2 rounded-full">
+                                            {isLoadingFriendRequest || isLoadingCancelRequest ? (
+                                                <MoonLoader />
+                                            ) : (
+                                                requests?.sentRequests.some(sentRequest => sentRequest.id === user.id) ? (
+                                                    <LiaUserCheckSolid className='text-gray-400 text-xl cursor-pointer' onClick={() => cancelFriendRequest({ currentUser, user })} />
+                                                ) : (
+                                                    <AiOutlineUserAdd className='text-gray-400 text-xl cursor-pointer' onClick={() => sendFriendRequest({ currentUser, user })} />
+                                                )
+                                            )}
+                                        </div>
+                                    </>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        )
+                        }
+                    </div >
                 ))}
-        </div>
+        </div >
     )
 }
