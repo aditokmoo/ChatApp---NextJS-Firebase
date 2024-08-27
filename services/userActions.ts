@@ -1,4 +1,5 @@
 import { db } from "@/lib/firebase";
+import { fetchUserData, removeFriendRequest } from "@/lib/firestoreHelpers";
 import { arrayRemove, arrayUnion, collection, doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 
 export async function startChat(currentUser: any, user: any) {
@@ -142,51 +143,58 @@ export async function sendFriendRequest(currentUser: any, user: any) {
     }
 }
 
-export async function cancelFriendRequest(currentUser: any, user: any) {
+export async function cancelFriendRequest(currentUser, user) {
     const currentUserRef = doc(db, 'friendRequests', currentUser?.id);
     const recipientUserRef = doc(db, 'friendRequests', user?.id);
 
     try {
-        // Fetch the current state of the documents
-        const currentUserDoc = await getDoc(currentUserRef);
-        const recipientUserDoc = await getDoc(recipientUserRef);
+        const [currentUserData, recipientUserData] = await Promise.all([
+            fetchUserData(currentUserRef),
+            fetchUserData(recipientUserRef),
+        ]);
 
-        const currentUserData = currentUserDoc.data();
-        const recipientUserData = recipientUserDoc.data();
+        const sentRequestToRemove = currentUserData?.sentRequests?.find(req => req.id === user.id);
+        const receivedRequestToRemove = recipientUserData?.receivedRequests?.find(req => req.id === currentUser.id);
 
-        // Find the request objects to remove
-        const sentRequestToRemove = currentUserData?.sentRequests?.find(
-            (req: any) => req.id === user.id
-        );
-
-        const receivedRequestToRemove = recipientUserData?.receivedRequests?.find(
-            (req: any) => req.id === currentUser.id
-        );
-
-        // Update the current user's sent requests by removing the recipient's request
-        if (sentRequestToRemove) {
-            await updateDoc(currentUserRef, {
-                sentRequests: arrayRemove(sentRequestToRemove),
-            });
-        }
-
-        // Update the recipient user's received requests by removing the current user's request
-        if (receivedRequestToRemove) {
-            await updateDoc(recipientUserRef, {
-                receivedRequests: arrayRemove(receivedRequestToRemove),
-            });
-        }
-
-        // Fetch and return the updated documents
-        const updatedCurrentUserDoc = await getDoc(currentUserRef);
-        const updatedRecipientUserDoc = await getDoc(recipientUserRef);
+        await Promise.all([
+            removeFriendRequest(currentUserRef, 'sentRequests', sentRequestToRemove),
+            removeFriendRequest(recipientUserRef, 'receivedRequests', receivedRequestToRemove),
+        ]);
 
         return {
-            sentRequests: updatedCurrentUserDoc.data()?.sentRequests || [],
-            receivedRequests: updatedRecipientUserDoc.data()?.receivedRequests || [],
+            sentRequests: (await fetchUserData(currentUserRef))?.sentRequests || [],
+            receivedRequests: (await fetchUserData(recipientUserRef))?.receivedRequests || [],
         };
     } catch (error) {
         console.error("Error canceling friend request:", error);
+        throw error;
+    }
+}
+
+export async function declineFriendRequest(currentUser, user) {
+    const currentUserRef = doc(db, 'friendRequests', currentUser?.id);
+    const recipientUserRef = doc(db, 'friendRequests', user?.id);
+
+    try {
+        const [currentUserData, recipientUserData] = await Promise.all([
+            fetchUserData(currentUserRef),
+            fetchUserData(recipientUserRef),
+        ]);
+
+        const receivedRequestToRemove = currentUserData?.receivedRequests?.find(req => req.id === user.id);
+        const sentRequestToRemove = recipientUserData?.sentRequests?.find(req => req.id === currentUser.id);
+
+        await Promise.all([
+            removeFriendRequest(currentUserRef, 'receivedRequests', receivedRequestToRemove),
+            removeFriendRequest(recipientUserRef, 'sentRequests', sentRequestToRemove),
+        ]);
+
+        return {
+            sentRequests: (await fetchUserData(currentUserRef))?.sentRequests || [],
+            receivedRequests: (await fetchUserData(recipientUserRef))?.receivedRequests || [],
+        };
+    } catch (error) {
+        console.error("Error declining friend request:", error);
         throw error;
     }
 }

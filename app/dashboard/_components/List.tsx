@@ -7,12 +7,12 @@ import { FaUsers } from 'react-icons/fa6';
 import { FaUserFriends } from 'react-icons/fa';
 import { IoNotificationsOutline } from 'react-icons/io5';
 import { useUserStore } from '@/zustand/userStore';
-import { useSendFriendRequest } from '@/hooks/useUserActions';
+import { useGetFriendRequests } from '@/hooks/useUserActions';
 
 export default function List() {
     const [activeTab, setActiveTab] = useState('users');
     const { currentUser } = useUserStore();
-    const { data: friendRequests, isLoading } = useSendFriendRequest(currentUser);
+    const { data: friendRequests, isLoading } = useGetFriendRequests(currentUser);
 
     if (isLoading) return <h2>Loading...</h2>
 
