@@ -19,6 +19,7 @@ export default function UserList() {
     const { mutate: sendFriendRequest, isPending: isSendingFriendRequest } = useFriendRequestAction('send', currentUser);
     const { mutate: cancelFriendRequest, isPending: isCancelingFriendRequest } = useFriendRequestAction('cancel', currentUser);
     const { mutate: declineFriendRequest, isPending: isDecliningFriendRequest } = useFriendRequestAction('decline', currentUser);
+    const { mutate: acceptFriendRequest, isPending: isAcceptingFriendRequest } = useFriendRequestAction('accept', currentUser);
 
     if (isLoadingAllUsers || isLoadingFriendRequest || isLoadingChat) return <div>Loading...</div>
 
@@ -45,11 +46,11 @@ export default function UserList() {
                         {currentUser?.id !== user?.id && (
                             <div className="absolute right-4 top-7 flex items-center gap-2">
                                 {friendRequests?.receivedRequests.some(request => request.id === user.id) ? (
-                                    isDecliningFriendRequest ? (
+                                    isDecliningFriendRequest || isAcceptingFriendRequest ? (
                                         <MoonLoader size={15} color='white' />
                                     ) : (
                                         <div className="flex items-center gap-3 justify-end w-full">
-                                            <div className="p-2 bg-green rounded-md cursor-pointer hover:opacity-70">
+                                            <div className="p-2 bg-green rounded-md cursor-pointer hover:opacity-70" onClick={() => acceptFriendRequest({ currentUser, user })}>
                                                 <FaCheck className='shadow-xl' />
                                             </div>
                                             <div className="p-2 bg-[#15182e] rounded-md cursor-pointer hover:opacity-70" onClick={() => declineFriendRequest({ currentUser, user })}>

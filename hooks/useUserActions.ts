@@ -1,4 +1,4 @@
-import { cancelFriendRequest, declineFriendRequest, fetchFriendRequests, sendFriendRequest, startChat } from "@/services/userActions";
+import { acceptFriendRequest, cancelFriendRequest, declineFriendRequest, fetchFriendRequests, sendFriendRequest, startChat } from "@/services/userActions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
@@ -10,6 +10,7 @@ export function useFriendRequestAction(actionType, currentUser) {
             if(actionType === 'send') return sendFriendRequest(currentUser, user);
             if(actionType === 'cancel') return cancelFriendRequest(currentUser, user);
             if(actionType === 'decline') return declineFriendRequest(currentUser, user);
+            if(actionType === 'accept') return acceptFriendRequest(currentUser, user);
         },
         onSuccess: (result) => {
             console.log(`${actionType} friend request succesfully: `, result);

@@ -1,6 +1,6 @@
 import { getDoc, updateDoc, arrayRemove } from "firebase/firestore";
 
-export async function fetchUserData(userRef) {
+export async function fetchFirebaseDoc(userRef) {
     const userDoc = await getDoc(userRef);
     return userDoc.data();
 }

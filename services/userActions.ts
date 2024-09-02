@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import { fetchUserData, removeFriendRequest } from "@/lib/firestoreHelpers";
+import { fetchFirebaseDoc, removeFriendRequest } from "@/lib/firestoreHelpers";
 import { arrayRemove, arrayUnion, collection, doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 
 export async function startChat(currentUser: any, user: any) {
@@ -143,14 +143,74 @@ export async function sendFriendRequest(currentUser: any, user: any) {
     }
 }
 
+export async function acceptFriendRequest(currentUser: any, user: any) {
+    console.log(currentUser)
+    console.log(user)
+    // Get document references
+    const currentUserRef = doc(db, 'users', currentUser?.id);
+    const recipientUserRef = doc(db, 'users', user?.id);
+    const currentUserFriendRequestRef = doc(db, 'friendRequests', currentUser?.id);
+    const recipientUserFriendRequestRef = doc(db, 'friendRequests', user?.id);
+
+    try {
+        // Fetch data for both users
+        const [currentUserData, recipientUserData] = await Promise.all([
+            fetchFirebaseDoc(currentUserFriendRequestRef),
+            fetchFirebaseDoc(recipientUserFriendRequestRef),
+        ]);
+
+        const receivedRequestToRemove = currentUserData?.receivedRequests?.find(req => req.id === user.id);
+        const sentRequestToRemove = recipientUserData?.sentRequests?.find(req => req.id === currentUser.id);
+        
+        // Remove from sentRequests and receivedRequests
+        await Promise.all([
+            removeFriendRequest(currentUserFriendRequestRef, 'receivedRequests', receivedRequestToRemove),
+            removeFriendRequest(recipientUserFriendRequestRef, 'sentRequests', sentRequestToRemove),
+        ]);
+
+
+        // Add each user to the other's friends array
+        const currentUserFriendData = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            avatar: user.avatar,
+        };
+
+        const recipientUserFriendData = {
+            id: currentUser.id,
+            username: currentUser.username,
+            email: currentUser.email,
+            avatar: currentUser.avatar,
+        };
+
+        await Promise.all([
+            updateDoc(currentUserRef, {
+                friends: arrayUnion(currentUserFriendData),
+            }),
+            updateDoc(recipientUserRef, {
+                friends: arrayUnion(recipientUserFriendData),
+            }),
+        ]);
+
+        return {
+            currentUserFriends: (await fetchFirebaseDoc(currentUserRef))?.friends || [],
+            recipientUserFriends: (await fetchFirebaseDoc(recipientUserRef))?.friends || [],
+        };
+    } catch (error) {
+        console.log("Error accepting friend request", error);
+        throw error;
+    }
+}
+
 export async function cancelFriendRequest(currentUser, user) {
     const currentUserRef = doc(db, 'friendRequests', currentUser?.id);
     const recipientUserRef = doc(db, 'friendRequests', user?.id);
 
-    try {
+    try {        
         const [currentUserData, recipientUserData] = await Promise.all([
-            fetchUserData(currentUserRef),
-            fetchUserData(recipientUserRef),
+            fetchFirebaseDoc(currentUserRef),
+            fetchFirebaseDoc(recipientUserRef),
         ]);
 
         const sentRequestToRemove = currentUserData?.sentRequests?.find(req => req.id === user.id);
@@ -162,8 +222,8 @@ export async function cancelFriendRequest(currentUser, user) {
         ]);
 
         return {
-            sentRequests: (await fetchUserData(currentUserRef))?.sentRequests || [],
-            receivedRequests: (await fetchUserData(recipientUserRef))?.receivedRequests || [],
+            sentRequests: (await fetchFirebaseDoc(currentUserRef))?.sentRequests || [],
+            receivedRequests: (await fetchFirebaseDoc(recipientUserRef))?.receivedRequests || [],
         };
     } catch (error) {
         console.error("Error canceling friend request:", error);
@@ -177,8 +237,8 @@ export async function declineFriendRequest(currentUser, user) {
 
     try {
         const [currentUserData, recipientUserData] = await Promise.all([
-            fetchUserData(currentUserRef),
-            fetchUserData(recipientUserRef),
+            fetchFirebaseDoc(currentUserRef),
+            fetchFirebaseDoc(recipientUserRef),
         ]);
 
         const receivedRequestToRemove = currentUserData?.receivedRequests?.find(req => req.id === user.id);
@@ -190,8 +250,8 @@ export async function declineFriendRequest(currentUser, user) {
         ]);
 
         return {
-            sentRequests: (await fetchUserData(currentUserRef))?.sentRequests || [],
-            receivedRequests: (await fetchUserData(recipientUserRef))?.receivedRequests || [],
+            sentRequests: (await fetchFirebaseDoc(currentUserRef))?.sentRequests || [],
+            receivedRequests: (await fetchFirebaseDoc(recipientUserRef))?.receivedRequests || [],
         };
     } catch (error) {
         console.error("Error declining friend request:", error);
