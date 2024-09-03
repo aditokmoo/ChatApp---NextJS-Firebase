@@ -108,6 +108,8 @@ export default function List() {
 
             const chatData = await Promise.all(promises)
 
+            console.log(chatData)
+
             setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
         })
 

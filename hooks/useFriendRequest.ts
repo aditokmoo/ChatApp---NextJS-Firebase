@@ -1,4 +1,4 @@
-import { acceptFriendRequest, cancelFriendRequest, declineFriendRequest, fetchFriendRequests, sendFriendRequest, startChat } from "@/services/friendRequestServices";
+import { acceptFriendRequest, cancelFriendRequest, declineFriendRequest, fetchFriendRequests, sendFriendRequest } from "@/services/friendRequestServices";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
