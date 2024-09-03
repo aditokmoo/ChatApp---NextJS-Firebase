@@ -1,4 +1,4 @@
-import { acceptFriendRequest, cancelFriendRequest, declineFriendRequest, fetchFriendRequests, sendFriendRequest, startChat } from "@/services/userActions";
+import { acceptFriendRequest, cancelFriendRequest, declineFriendRequest, fetchFriendRequests, sendFriendRequest, startChat } from "@/services/friendRequestServices";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
@@ -7,10 +7,10 @@ export function useFriendRequestAction(actionType, currentUser) {
     const { mutate, isPending } = useMutation({
         mutationKey: [actionType],
         mutationFn: ({ currentUser, user }) => {
-            if(actionType === 'send') return sendFriendRequest(currentUser, user);
-            if(actionType === 'cancel') return cancelFriendRequest(currentUser, user);
-            if(actionType === 'decline') return declineFriendRequest(currentUser, user);
-            if(actionType === 'accept') return acceptFriendRequest(currentUser, user);
+            if (actionType === 'send') return sendFriendRequest(currentUser, user);
+            if (actionType === 'cancel') return cancelFriendRequest(currentUser, user);
+            if (actionType === 'decline') return declineFriendRequest(currentUser, user);
+            if (actionType === 'accept') return acceptFriendRequest(currentUser, user);
         },
         onSuccess: (result) => {
             console.log(`${actionType} friend request succesfully: `, result);
@@ -34,20 +34,4 @@ export function useGetFriendRequests(currentUser) {
     });
 
     return { data, isLoading }
-}
-
-export function useStartChat() {
-    const { mutate, isPending, isError, isSuccess, data, error } = useMutation({
-        mutationKey: ['startChat'],
-        mutationFn: ({ currentUser, user }) => startChat(currentUser, user),
-        onSuccess: (result) => {
-            console.log("Chat started successfully:", result);
-        },
-        onError: (error) => {
-            toast.error("Something went wrong!");
-            console.log(error)
-        }
-    });
-
-    return { mutate, isPending, isError, isSuccess, data, error };
 }

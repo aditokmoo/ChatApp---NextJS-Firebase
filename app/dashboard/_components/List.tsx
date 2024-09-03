@@ -7,7 +7,7 @@ import { FaUsers } from 'react-icons/fa6';
 import { FaUserFriends } from 'react-icons/fa';
 import { IoNotificationsOutline } from 'react-icons/io5';
 import { useUserStore } from '@/zustand/userStore';
-import { useGetFriendRequests } from '@/hooks/useUserActions';
+import { useGetFriendRequests } from '@/hooks/useFriendRequest';
 
 export default function List() {
     const [activeTab, setActiveTab] = useState('users');

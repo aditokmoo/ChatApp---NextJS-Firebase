@@ -6,8 +6,9 @@ import { TbMessageDots } from "react-icons/tb";
 import { FaCheck, FaSearch, FaTimes } from 'react-icons/fa';
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { LiaUserCheckSolid } from "react-icons/lia";
-import { useFriendRequestAction, useGetFriendRequests, useStartChat } from '@/hooks/useUserActions';
+import { useFriendRequestAction, useGetFriendRequests } from '@/hooks/useFriendRequest';
 import { MoonLoader } from 'react-spinners';
+import { useStartChat } from '@/hooks/useChat';
 
 export default function UserList() {
     const { data: allUsers, isLoading: isLoadingAllUsers } = useGetAllUsers();
@@ -23,7 +24,7 @@ export default function UserList() {
 
     if (isLoadingAllUsers || isLoadingFriendRequest || isLoadingChat) return <div>Loading...</div>
 
-    console.log(friendRequests)
+    console.log(currentUser)
 
     return (
         <div className="flex flex-col w-full">
@@ -63,17 +64,19 @@ export default function UserList() {
                                         <div className="bg-[#15182e] hover:opacity-60 p-2 rounded-full">
                                             <TbMessageDots className='text-gray-400 text-xl cursor-pointer' onClick={() => startChat({ currentUser, user })} />
                                         </div>
-                                        <div className="bg-[#15182e] hover:opacity-60 p-2 rounded-full">
-                                            {isSendingFriendRequest || isCancelingFriendRequest ? (
-                                                <MoonLoader size={15} color='white' />
-                                            ) : (
-                                                friendRequests?.sentRequests.some(sentRequest => sentRequest.id === user.id) ? (
-                                                    <LiaUserCheckSolid className='text-gray-400 text-xl cursor-pointer' onClick={() => cancelFriendRequest({ currentUser, user })} />
+                                        {!currentUser.friends.some(({ id }) => user.id === id) && (
+                                            <div className="bg-[#15182e] hover:opacity-60 p-2 rounded-full">
+                                                {isSendingFriendRequest || isCancelingFriendRequest ? (
+                                                    <MoonLoader size={15} color='white' />
                                                 ) : (
-                                                    <AiOutlineUserAdd className='text-gray-400 text-xl cursor-pointer' onClick={() => sendFriendRequest({ currentUser, user })} />
-                                                )
-                                            )}
-                                        </div>
+                                                    friendRequests?.sentRequests.some(sentRequest => sentRequest.id === user.id) ? (
+                                                        <LiaUserCheckSolid className='text-gray-400 text-xl cursor-pointer' onClick={() => cancelFriendRequest({ currentUser, user })} />
+                                                    ) : (
+                                                        <AiOutlineUserAdd className='text-gray-400 text-xl cursor-pointer' onClick={() => sendFriendRequest({ currentUser, user })} />
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
                                     </>
                                 )}
                             </div>
