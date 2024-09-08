@@ -1,10 +1,10 @@
 'use client'
-import { useCreateAccount } from '@/hooks/useAuth';
 import { useForm } from 'react-hook-form';
 import noImageUser from '@/assets/no-image-user-avatar.png'
 import Image from 'next/image';
 import { useState } from 'react';
 import ProgressBar from '@/components/ProgressBar';
+import { useCreateAccount } from '@/hooks/useAuth';
 
 interface AvatarState {
     file: File | null;

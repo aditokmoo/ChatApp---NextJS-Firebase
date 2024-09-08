@@ -25,6 +25,7 @@ export async function createAccount(registerData: RegisterDataType) {
             return progress
         });
 
+        console.log(imgUrl)
 
         await setDoc(doc(db, "users", response.user.uid), {
             username,
