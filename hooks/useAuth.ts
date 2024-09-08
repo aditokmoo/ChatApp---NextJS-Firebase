@@ -1,10 +1,8 @@
 'use client'
-import { auth, db } from "@/lib/firebase";
-import upload from "@/lib/upload";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+
+import { createAccount, login } from "@/services/authServices";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation"
 import { toast } from "react-toastify";
 
 interface RegisterDataType {
@@ -19,72 +17,46 @@ interface LoginDataType {
     password: string
 }
 
-export default function useAuth() {
+// Login hook for handling login service
+export function useLogin() {
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
-    const [progress, setProgress] = useState(0);
-
-    const createAccount = async (data: RegisterDataType) => {
-        const { username, email, password, avatar } = data;
-
-        setIsLoading(true);
-
-        try {
-            const response = await createUserWithEmailAndPassword(auth, email, password);
-
-            const imgUrl = await upload(avatar, (progress) => {
-                setProgress(progress);
-            });
-
-
-            await setDoc(doc(db, "users", response.user.uid), {
-                username,
-                email,
-                avatar: imgUrl,
-                id: response.user.uid,
-                friends: [],
-                blocked: [],
-            });
-
-            await setDoc(doc(db, "userChats", response.user.uid), {
-                chats: [],
-            });
-
-            toast.success('Account has been created!');
-            router.push('/auth/login');
-        } catch (error) {
+    const mutation = useMutation({
+        mutationKey: ['login'],
+        mutationFn: (loginData: LoginDataType) => login(loginData),
+        onSuccess: (result) => {
+            router.push('/dashboard')
+            console.log('Login: ', result)
+        },
+        onError: (error) => {
             if (error instanceof Error && error.message === 'Firebase: Error (auth/email-already-in-use).') {
                 toast.error('Email already in use!');
             } else {
                 toast.error(error instanceof Error && error.message);
             }
-        } finally {
-            setIsLoading(false);
         }
-    }
+    })
 
-    const login = async (data: LoginDataType) => {
-        const { email, password } = data;
+    return mutation;
+}
 
-        setIsLoading(true);
-
-        try {
-            const response = await signInWithEmailAndPassword(auth, email, password);
-            console.log(response);
-
-            // Show the success toast and navigate immediately
-            toast.success('Successfully logged in!');
-            router.push('/dashboard');
-        } catch (error) {
+// Register hook for handling create account service
+export function useCreateAccount() {
+    const router = useRouter();
+    const mutation = useMutation({
+        mutationKey: ['register'],
+        mutationFn: (registerData: RegisterDataType) => createAccount(registerData),
+        onSuccess: (result) => {
+            router.push('/auth/login');
+            console.log('Register: ', result);
+        },
+        onError: (error) => {
             if (error instanceof Error && error.message === 'Firebase: Error (auth/invalid-credential).') {
                 toast.error('Wrong credentials!');
             } else {
                 toast.error(error instanceof Error && error.message);
             }
-        } finally {
-            setIsLoading(false);
         }
-    }
+    });
 
-    return { createAccount, login, progress, isLoading };
+    return mutation;
 }

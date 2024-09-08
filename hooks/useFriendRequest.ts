@@ -27,7 +27,7 @@ export function useFriendRequestAction(actionType, currentUser) {
 
 export function useGetFriendRequests(currentUser) {
     const { data, isLoading } = useQuery({
-        queryKey: ['friendRequests', currentUser.id],
+        queryKey: ['friendRequests', currentUser?.id],
         queryFn: () => fetchFriendRequests(currentUser),
         enabled: !!currentUser,
         staleTime: 1000 * 60 * 5,
