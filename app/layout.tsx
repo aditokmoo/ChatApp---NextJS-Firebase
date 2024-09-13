@@ -4,7 +4,6 @@ import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
 import QueryProvider from "./_components/QueryProvider";
-import AppLayout from "./dashboard/_components/AppLayout";
 
 const poppins = Poppins({ weight: '400', subsets: ["latin"] });
 
@@ -22,9 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={poppins.className}>
         <QueryProvider>
-          <AppLayout>
             {children}
-          </AppLayout>
         </QueryProvider>
         <ToastContainer />
       </body>

@@ -9,11 +9,22 @@ import { auth } from '@/lib/firebase';
 export default function DashboardLayout({ children }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { currentUser, isLoading } = useUserStore();
+    const { currentUser, isLoading, fetchUserInfo } = useUserStore();
+    const router = useRouter();
 
-    if (isLoading || (!isLoading && !currentUser)) {
-        return <h2>Loading...</h2>
-    }
+    useEffect(() => {
+        const unSub = onAuthStateChanged(auth, (user) => {
+            console.log(user)
+            fetchUserInfo(user?.uid);
+        })
+
+        return () => unSub()
+    }, [fetchUserInfo])
+
+    
+    if(isLoading) return <h2>loading....</h2>
+
+    if(!currentUser) return router.push('/auth/login')
 
     return (
         <main className='h-full flex justify-between'>
